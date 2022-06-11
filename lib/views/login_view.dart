@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -62,11 +64,14 @@ class _LoginViewState extends State<LoginView> {
                       try {
                         final userCredential = await FirebaseAuth.instance
                             .signInWithEmailAndPassword(
-                                email: email, password: pass);
-                        print(userCredential);
-                        print("Login Successful");
+                          email: email,
+                          password: pass,
+                        );
+                        // ignore: use_build_context_synchronously
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            '/notes/', (route) => false);
                       } on FirebaseAuthException catch (e) {
-                        print(e.code);
+                        log(e.code);
                       }
                     },
                     child: const Text("Login")),

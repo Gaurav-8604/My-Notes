@@ -1,4 +1,4 @@
-import 'dart:developer' show log;
+//import 'dart:developer' show log;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +20,7 @@ void main() {
       routes: {
         '/login/': (context) => const LoginView(),
         '/register/': (context) => const RegisterView(),
+        '/notes/': (context) => const NotesView(),
       },
     ),
   );
@@ -77,6 +78,7 @@ class _NotesViewState extends State<NotesView> {
                   final logout = await logoutDialog(context);
                   if (logout) {
                     await FirebaseAuth.instance.signOut();
+                    // ignore: use_build_context_synchronously
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil('/login/', (route) => false);
                   }
