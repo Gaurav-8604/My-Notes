@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer' show log;
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -5,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:notes/constants/routes.dart';
 import '../firebase_options.dart';
+import '../utilities/show_error.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -76,7 +79,9 @@ class _LoginViewState extends State<LoginView> {
                               verifyEmailRoute, (route) => false);
                         }
                       } on FirebaseAuthException catch (e) {
-                        log(e.code);
+                        await showError(context, 'Error: ${e.code}');
+                      } catch (e) {
+                        await showError(context, e.toString());
                       }
                     },
                     child: const Text("Login")),
