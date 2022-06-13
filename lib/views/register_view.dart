@@ -64,9 +64,13 @@ class _RegisterViewState extends State<RegisterView> {
                         final email = _email.text;
                         final pass = _pass.text;
                         try {
-                          final userCredential = await FirebaseAuth.instance
+                          await FirebaseAuth.instance
                               .createUserWithEmailAndPassword(
                                   email: email, password: pass);
+                          final user = FirebaseAuth.instance.currentUser;
+                          await user?.sendEmailVerification();
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pushNamed(verifyEmailRoute);
                         } on FirebaseAuthException catch (e) {
                           await showError(context, 'Error: ${e.code}');
                         } catch (e) {

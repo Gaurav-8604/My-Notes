@@ -6,7 +6,6 @@ import 'package:notes/constants/routes.dart';
 import 'package:notes/views/login_view.dart';
 import 'package:notes/views/register_view.dart';
 import 'package:notes/views/verifyemail_view.dart';
-
 import 'firebase_options.dart';
 
 void main() {
@@ -21,7 +20,7 @@ void main() {
       routes: {
         '/login/': (context) => const LoginView(),
         '/register/': (context) => const RegisterView(),
-        'verifyemail/': (context) => const VerifyEmail(),
+        '/verifyemail/': (context) => const VerifyEmail(),
         '/notes/': (context) => const NotesView(),
       },
     ),

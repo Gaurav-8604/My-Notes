@@ -72,8 +72,7 @@ class _LoginViewState extends State<LoginView> {
                           password: pass,
                         );
                         if (userCredential.user?.emailVerified == true) {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                              notesRoute, (route) => false);
+                          Navigator.of(context).pushNamed(notesRoute);
                         } else {
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               verifyEmailRoute, (route) => false);
