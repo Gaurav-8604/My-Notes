@@ -1,7 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-
-import 'dart:developer' show log;
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -66,14 +63,16 @@ class _LoginViewState extends State<LoginView> {
                       final email = _email.text;
                       final pass = _pass.text;
                       try {
-                        final userCredential = await FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
                           email: email,
                           password: pass,
                         );
-                        if (userCredential.user?.emailVerified == true) {
+                        final userCredential =
+                            FirebaseAuth.instance.currentUser;
+                        if (userCredential?.emailVerified == true) {
                           Navigator.of(context).pushNamed(notesRoute);
                         } else {
+                          await showError(context, "Email not verified");
                           Navigator.of(context).pushNamedAndRemoveUntil(
                               verifyEmailRoute, (route) => false);
                         }
