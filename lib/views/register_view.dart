@@ -1,9 +1,8 @@
-import 'package:firebase_core/firebase_core.dart';
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:notes/constants/routes.dart';
-import 'package:notes/firebase_options.dart';
-
+import 'package:notes/services/auth/auth_exceptions.dart';
+import '../services/auth/auth_service.dart';
 import '../utilities/show_error.dart';
 
 class RegisterView extends StatefulWidget {
@@ -35,62 +34,52 @@ class _RegisterViewState extends State<RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Register')),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Column(
-                children: [
-                  TextField(
-                      controller: _email,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration:
-                          const InputDecoration(hintText: "Enter your email")),
-                  TextField(
-                      controller: _pass,
-                      obscureText: true,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      decoration: const InputDecoration(
-                        hintText: "Enter your password",
-                      )),
-                  TextButton(
-                      onPressed: () async {
-                        final email = _email.text;
-                        final pass = _pass.text;
-                        try {
-                          await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                  email: email, password: pass);
-                          final user = FirebaseAuth.instance.currentUser;
-                          await user?.sendEmailVerification();
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushNamed(verifyEmailRoute);
-                        } on FirebaseAuthException catch (e) {
-                          await showError(context, 'Error: ${e.code}');
-                        } catch (e) {
-                          await showError(context, e.toString());
-                        }
-                      },
-                      child: const Text("Register")),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          loginRoute, (route) => false);
-                    },
-                    child: const Text("Already have an account? Login Here"),
-                  ),
-                ],
-              );
-            default:
-              return const Text("Loading...");
-          }
-        },
+      body: Column(
+        children: [
+          TextField(
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(hintText: "Enter your email")),
+          TextField(
+              controller: _pass,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Enter your password",
+              )),
+          TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final pass = _pass.text;
+                try {
+                  await AuthService.firebase().createUser(
+                    email: email,
+                    password: pass,
+                  );
+                  AuthService.firebase().sendEmailVerification();
+                  Navigator.of(context).pushNamed(verifyEmailRoute);
+                } on EmailAlreadyInUseAuthException {
+                  await showError(context, 'Email already in use');
+                } on WeakPasswordAuthException {
+                  await showError(context, 'Weak password');
+                } on InvalidEmailAuthException {
+                  await showError(context, 'Invalid Email');
+                } on GenericAuthException {
+                  await showError(context, 'Authentication error');
+                }
+              },
+              child: const Text("Register")),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(loginRoute, (route) => false);
+            },
+            child: const Text("Already have an account? Login Here"),
+          ),
+        ],
       ),
     );
   }
