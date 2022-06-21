@@ -19,15 +19,11 @@ class _VerifyEmailState extends State<VerifyEmail> {
           const Text("Email not verified."),
           const Text("We've sent an email verification link."),
           const Text('Please verify your email address.'),
-          const Text(""),
-          const Text(""),
-          const Text(""),
-          const Text("Haven't received email. Click the below button"),
           TextButton(
               onPressed: () {
                 AuthService.firebase().sendEmailVerification();
               },
-              child: const Text('Send Email')),
+              child: const Text('Resend Email')),
           TextButton(
               onPressed: () async {
                 AuthService.firebase().logOut();
