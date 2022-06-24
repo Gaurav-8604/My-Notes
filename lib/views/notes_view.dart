@@ -7,6 +7,7 @@ import '../enums/menu_actions.dart';
 import '../services/auth/auth_service.dart';
 
 class NotesView extends StatefulWidget {
+  final String name = "Gaurav";
   const NotesView({Key? key}) : super(key: key);
 
   @override
