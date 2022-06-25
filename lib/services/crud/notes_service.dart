@@ -197,7 +197,7 @@ class NotesService {
   }
 
   Future<void> open() async {
-    if (_db != Null) throw DatabaseAlreadyOpenException();
+    if (_db != null) throw DatabaseAlreadyOpenException();
     try {
       final docsPath = await getApplicationDocumentsDirectory();
       final dbPath = join(docsPath.path, dbName);
