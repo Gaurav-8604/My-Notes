@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 @immutable
 class AuthUser {
   final String? email;
-  final String name = "Gaurav";
   final bool isEmailVerified;
   const AuthUser({required this.email, required this.isEmailVerified});
   factory AuthUser.fromFirebase(User user) => AuthUser(

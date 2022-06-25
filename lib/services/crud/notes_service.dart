@@ -9,7 +9,6 @@ import 'package:path_provider/path_provider.dart';
 
 class NotesService {
   Database? _db;
-  final String name = "Gaurav";
   List<DatabaseNote> _notes = [];
   static final NotesService _shared = NotesService._sharedInstance();
   NotesService._sharedInstance();
