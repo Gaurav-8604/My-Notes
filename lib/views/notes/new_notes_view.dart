@@ -77,7 +77,7 @@ class _NewNoteViewState extends State<NewNoteView> {
                   return TextField(
                     controller: _textController,
                     keyboardType: TextInputType.multiline,
-                    maxLines: 100,
+                    maxLines: null,
                     decoration: const InputDecoration(
                       hintText: "Type your notes here",
                     ),
