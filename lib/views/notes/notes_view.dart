@@ -1,10 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:notes/main.dart';
 import 'package:notes/services/crud/notes_service.dart';
+import 'package:notes/views/notes/notes_list_view.dart';
 import '../../constants/routes.dart';
 import '../../enums/menu_actions.dart';
 import '../../services/auth/auth_service.dart';
+import '../../utilities/dialog/logout_dialog.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class _NotesViewState extends State<NotesView> {
           PopupMenuButton(onSelected: (value) async {
             switch (value) {
               case MenuAction.logout:
-                final logout = await logoutDialog(context);
+                final logout = await showLogoutDialog(context);
                 if (logout) {
                   await AuthService.firebase().logOut();
                   Navigator.of(context)
@@ -62,20 +63,11 @@ class _NotesViewState extends State<NotesView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseNote>;
-                        return ListView.builder(
-                          itemBuilder: (context, index) {
-                            final note = allNotes[index];
-                            return ListTile(
-                              title: Text(
-                                note.text,
-                                maxLines: 1,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          },
-                          itemCount: allNotes.length,
-                        );
+                        return NotesListView(
+                            notes: allNotes,
+                            onDeleteNote: (note) async {
+                              await _notesService.deleteNote(id: note.id);
+                            });
                       } else {
                         return const CircularProgressIndicator();
                       }
