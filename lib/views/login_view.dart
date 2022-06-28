@@ -1,8 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import '../firebase_options.dart';
-import '../main.dart';
+import 'package:notes/constants/routes.dart';
+import 'package:notes/services/auth/auth_exceptions.dart';
+import '../services/auth/auth_service.dart';
+import '../utilities/dialog/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
@@ -33,49 +35,61 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.done:
-              return Column(children: [
-                TextField(
-                    controller: _email,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration:
-                        const InputDecoration(hintText: "Enter your email")),
-                TextField(
-                    controller: _pass,
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    decoration: const InputDecoration(
-                      hintText: "Enter your password",
-                    )),
-                TextButton(
-                    onPressed: () async {
-                      final email = _email.text;
-                      final pass = _pass.text;
-                      try {
-                        final userCredential = await FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
-                                email: email, password: pass);
-                        print(userCredential);
-                        print("Login Successful");
-                      } on FirebaseAuthException catch (e) {
-                        print(e.code);
-                      }
-                    },
-                    child: const Text("Login")),
-              ]);
-            default:
-              return const Text("Loading...");
-          }
-        },
+      body: Column(
+        children: [
+          TextField(
+              controller: _email,
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(hintText: "Enter your email")),
+          TextField(
+              controller: _pass,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                hintText: "Enter your password",
+              )),
+          TextButton(
+              onPressed: () async {
+                final email = _email.text;
+                final pass = _pass.text;
+                try {
+                  await AuthService.firebase()
+                      .logIn(email: email, password: pass);
+                  final user = AuthService.firebase().currentUser;
+                  if (user?.isEmailVerified == true) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil(notesRoute, (route) => false);
+                  } else {
+                    await showErrorDialog(context, "Email not verified");
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        verifyEmailRoute, (route) => false);
+                  }
+                } on UserNotFoundAuthException {
+                  await showErrorDialog(
+                    context,
+                    "User not found",
+                  );
+                } on WrongPasswordAuthException {
+                  await showErrorDialog(
+                    context,
+                    "Wrong credentials",
+                  );
+                } on GenericAuthException {
+                  await showErrorDialog(context, 'Authentication error');
+                }
+              },
+              child: const Text("Login")),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(registerRoute, (route) => false);
+            },
+            child: const Text("Not Registered yet? Register Here"),
+          ),
+        ],
       ),
     );
   }
