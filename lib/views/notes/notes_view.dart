@@ -69,10 +69,10 @@ class _NotesViewState extends State<NotesView> {
                               await _notesService.deleteNote(id: note.id);
                             });
                       } else {
-                        return const CircularProgressIndicator();
+                        return const Text("No Notes! Create new");
                       }
                     default:
-                      return const CircularProgressIndicator();
+                      return const Text("Error Occured!");
                   }
                 },
               );
